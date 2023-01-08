@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [amd64, i386]
+        arch: [amd64]
 
     env:
       ARCH: ${{ matrix.arch }}
@@ -33,7 +33,7 @@ jobs:
       run: mv sparsebundlefs sparsebundlefs_$ARCH
 
     - name: Release
-      uses: softprops/action-gh-release@b21b43df682dab285bf5146c1955e7f3560805f8
+      uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
       with:
         files: |
           sparsebundlefs_${{ matrix. arch }}
