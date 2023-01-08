@@ -1,0 +1,38 @@
+
+on:
+  push:
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0
+
+name: Release
+
+jobs:
+  release_linux:
+      strategy:
+        fail-fast: false
+        matrix:
+          arch: [amd64, i386]
+
+      env:
+        ARCH: ${{ matrix.arch }}
+
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          sudo dpkg --add-architecture $ARCH
+          sudo apt-get update
+          sudo apt-get install -y g++-multilib pkg-config:$ARCH libfuse-dev:$ARCH fuse:$ARCH
+
+      - name: Build
+        run: make
+
+      - name: Release
+        uses: softprops/action-gh-release@b21b43df682dab285bf5146c1955e7f3560805f8
+        with:
+          files: |
+            sparsebundlefs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
