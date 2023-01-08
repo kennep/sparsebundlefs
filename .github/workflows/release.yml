@@ -18,7 +18,7 @@ jobs:
 
       steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install dependencies
         run: |
@@ -29,10 +29,13 @@ jobs:
       - name: Build
         run: make
 
+     - name: Rename binary
+        run: mv sparsebundlefs sparsebundlefs_$ARCH
+
       - name: Release
         uses: softprops/action-gh-release@b21b43df682dab285bf5146c1955e7f3560805f8
         with:
           files: |
-            sparsebundlefs
+            sparsebundlefs_${{ matrix. arch }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
