@@ -7,34 +7,35 @@ name: Release
 
 jobs:
   release_linux:
-      strategy:
-        fail-fast: false
-        matrix:
-          arch: [amd64, i386]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, i386]
 
+    env:
+      ARCH: ${{ matrix.arch }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo dpkg --add-architecture $ARCH
+        sudo apt-get update
+        sudo apt-get install -y g++-multilib pkg-config:$ARCH libfuse-dev:$ARCH fuse:$ARCH
+
+    - name: Build
+      run: make
+
+    - name: Rename binary
+      run: mv sparsebundlefs sparsebundlefs_$ARCH
+
+    - name: Release
+      uses: softprops/action-gh-release@b21b43df682dab285bf5146c1955e7f3560805f8
+      with:
+        files: |
+          sparsebundlefs_${{ matrix. arch }}
       env:
-        ARCH: ${{ matrix.arch }}
-
-      steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: |
-          sudo dpkg --add-architecture $ARCH
-          sudo apt-get update
-          sudo apt-get install -y g++-multilib pkg-config:$ARCH libfuse-dev:$ARCH fuse:$ARCH
-
-      - name: Build
-        run: make
-
-      - name: Rename binary
-        run: mv sparsebundlefs sparsebundlefs_$ARCH
-
-      - name: Release
-        uses: softprops/action-gh-release@b21b43df682dab285bf5146c1955e7f3560805f8
-        with:
-          files: |
-            sparsebundlefs_${{ matrix. arch }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
